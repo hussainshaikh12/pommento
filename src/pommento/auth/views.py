@@ -15,6 +15,13 @@ from pommento.auth.forms import (
 from pommento.auth.utils import validate_google_id_token
 from pommento.billing.utils import create_subscription_for_user
 
+from django.core.exceptions import ObjectDoesNotExist
+from pangea.config import PangeaConfig
+from pangea.services import Audit
+
+
+# config = PangeaConfig(domain=settings.PANGEA_DOMAIN)
+# audit = Audit(settings.PANGEA_TOKEN, config=config)
 
 @never_cache
 @require_http_methods(["GET", "POST"])
@@ -89,19 +96,33 @@ def login_view(request):
 
     if request.method == "POST":
         if form.is_valid():
-            if user.has_usable_password():
-                user = authenticate(
-                    request,
-                    username=form.cleaned_data.get("email", None),
-                    password=form.cleaned_data.get("password", None),
-                )
-                if user is not None:
-                    login(request, user)
-                    return redirect("index")
+            username=form.cleaned_data.get("email")
+            
+            try:
+                exist =  get_user_model().objects.get(email=username)
+                if exist and exist.google_id is None:
+                    user = authenticate(
+                        request,
+                        username=form.cleaned_data.get("email", None),
+                        password=form.cleaned_data.get("password", None),
+                    )
+                    if user is not None:
+                        login(request, user)
+                        # audit.log("User: " +request.user.name+ " logged into the app")
+                        return redirect("pommento-core:site-list")
+                    else:
+                        form.add_error(None, "Incorrect email address or password.")
                 else:
-                    form.add_error(None, "Incorrect email address or password.")
-            else:
-                form.add_error(None, "You registered using your Google Account. Please use Sign In with Google to sign in.")
+                    form.add_error(
+                        None,
+                        "You registered using your Google Account. Please use Sign In with Google to sign in.",
+                    )
+            except ObjectDoesNotExist:
+                form.add_error(
+                    None,
+                    "User not registered",
+                )
+                
 
     return render(request, "auth/pages/login.html", context)
 
@@ -125,25 +146,24 @@ def register_view(request):
 
                 user.set_password(form.cleaned_data["password"])
                 user.save()
-
-                create_subscription_for_user(user, settings.SUBSCRIPTION_TRIAL_PERIOD_DAYS)
+                
 
                 login(request, user)
-                return redirect("index")
+                # audit.log("User: " +request.user.name+ " Regiestered and logged into the app")
+                return redirect("pommento-core:site-list")
             except IntegrityError as e:
                 form.add_error(
-                    None, "Este correo electrónico ya está asociado a una cuenta."
+                    None, "User Already exist"
                 )
 
     return render(request, "auth/pages/register.html", context)
 
 
 @never_cache
-@require_POST
 @login_required(redirect_field_name=None)
 def logout_view(request):
     logout(request)
-    return redirect("index")
+    return redirect("pommento-auth:login")
 
 
 @require_POST
@@ -165,10 +185,11 @@ def signin_with_google_view(request):
     if created:
         user.name = idinfo["name"]
         user.set_unusable_password()
-        create_subscription_for_user(user, settings.SUBSCRIPTION_TRIAL_PERIOD_DAYS)
-    
+
+
     user.google_id = idinfo["sub"]
     user.save()
 
     login(request, user)
-    return redirect("index") 
+    # audit.log("User: " +request.user.name+ " logged in using google into the app")
+    return redirect("pommento-core:site-list")

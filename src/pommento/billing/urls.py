@@ -4,6 +4,8 @@ from pommento.billing import views
 app_name = "pommento-billing"
 
 urlpatterns = [
+    path("settings/billing/cancel", views.cancel, name="cancel"),
+    path("settings/billing/success", views.success, name="success"),
     path("settings/billing/", views.billing_settings_view, name="billing-settings"),
     path(
         "billing/subscribe-checkout/create/",

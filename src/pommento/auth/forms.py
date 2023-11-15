@@ -83,9 +83,3 @@ class RegisterForm(forms.Form):
         ),
     )
 
-    terms = forms.BooleanField(
-        widget=forms.CheckboxInput(),
-        error_messages={
-            "required": "You need to accept the Terms and Conditions.",
-        },
-    )

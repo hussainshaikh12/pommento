@@ -1,0 +1,69 @@
+{% load static i18n compress tailwind_tags %}
+{% get_current_language as LANGUAGE_CODE %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" dir="ltr">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {% block head %}{% endblock %}
+        {% compress css %}
+            {% tailwind_css %}
+        {% endcompress %}
+        <script src="https://cdn.jsdelivr.net/npm/kutty@latest/dist/alpinejs.min.js"></script>
+        <script src="https://unpkg.com/htmx.org@1.9.8"></script>
+        <link rel="icon"
+              type="image/svg+xml"
+              href="{% static 'img/favicon/favicon.svg' %}">
+        <link rel="icon"
+              type="image/png"
+              href="{% static 'img/favicon/favicon.png' %}">
+    </head>
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'></body>
+    <section class="bg-white dark:bg-gray-900 py-8 lg:py-16 antialiased">
+        <div class="max-w-2xl mx-auto" x-data="{ open: false }">
+            <div class="border border-gray-300 p-4 rounded-lg max-w-2xl mx-auto mb-4">
+                <h2 class="text-lg font-medium mb-2">Leave a comment</h2>
+                {% for error in form.errors %}
+                    <div role="alert" class="mb-2 w-full bg-red-500 py-2 px-4 rounded">
+                        <span class="text-white">{{ error }}</span>
+                    </div>
+                {% endfor %}
+                <div id="alert"
+                     class="alert bg-gray-900 text-primary alert-closable mb-3"
+                     role="alert"
+                     x-ref="alert"
+                     x-show.transition="open">
+                    Send for review
+                    <button class="rounded-l-none btn btn-dark btn-sm alert-close"
+                            @click="open = false">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="24"
+                             height="24"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <form hx-post="{% url 'pommento-core:comment-widget' %}"
+                      hx-on::after-request="this.reset();"
+                      @submit="open = true"
+                      hx-target="#comment-list">
+                    {{ form }}
+                    <input type="text" name="page_id" value="{{ page_id }}" hidden>
+                    <div class="flex justify-end">
+                        <button class="btn btn-dark text-white font-medium py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                type="submit">
+                            Post Comment
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div id="comment-list" class="  p-4 {% if comments %} border-t shadow {% endif %}">{% include "core/partials/comment-list.html" %}</div>
+        </div>
+    </section>
+</body>
+</html>

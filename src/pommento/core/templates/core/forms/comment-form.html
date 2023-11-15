@@ -1,0 +1,27 @@
+{% for error in form.errors %}
+    <div role="alert" class="mb-2 w-full bg-red-500 py-2 px-4 rounded">
+        <span class="text-white">{{ error }}</span>
+    </div>
+{% endfor %}
+<div class="mb-4">
+    <label class="block text-gray-700 font-medium mb-2" for="name">Name</label>
+    <input class="appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none"
+           id="name"
+           name="name"
+           type="text"
+           placeholder="Enter your name"
+           required>
+</div>
+<div class="mb-4">
+    <label class="block text-gray-700 font-medium mb-2" for="email">Email</label>
+    <input class="appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none"
+           id="email"
+           name="email"
+           type="email"
+           placeholder="Enter your email"
+           required>
+</div>
+<div class="mb-4">
+    <label class="block text-gray-700 font-medium mb-2" for="comment">Comment</label>
+    <textarea rows="4" class="appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none" id="comment" name="comment" placeholder="Enter your comment" required></textarea>
+</div>

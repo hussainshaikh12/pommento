@@ -10,9 +10,9 @@ from pommento.utils import default_uuid
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, name=None, **extra_fields):
         if not email:
-            raise ValueError('Enter an email address')
+            raise ValueError("Enter an email address")
         if not name:
-            raise ValueError('Enter a name')
+            raise ValueError("Enter a name")
         email = self.normalize_email(email)
         user = self.model(email=email, name=name, **extra_fields)
         user.set_password(password)
@@ -45,7 +45,9 @@ class User(AbstractUser):
     email = models.EmailField(max_length=255, unique=True, null=False, blank=False)
 
     google_id = models.CharField(
-        null=True, blank=False, max_length=255,
+        null=True,
+        blank=False,
+        max_length=255,
     )
 
     objects = UserManager()
@@ -75,3 +77,7 @@ class User(AbstractUser):
             expand=["default_payment_method"],
         )
         return subscription
+    
+    def __str__(self):
+        return str(self.name)
+

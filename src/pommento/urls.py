@@ -6,7 +6,7 @@ from pommento import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", views.index_view, name="index"),
+    path("", include("pommento.core.urls")),
     path("", include("pommento.auth.urls")),
     path("", include("pommento.billing.urls")),
 ]

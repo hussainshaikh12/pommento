@@ -1,0 +1,22 @@
+{% for error in form.errors %}
+    <div role="alert" class="mb-2 w-full bg-red-500 py-2 px-4 rounded">
+        <span class="text-white">{{ error }}</span>
+    </div>
+{% endfor %}
+<div>
+    <label class="block text-l" for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+    <input id="id_title"
+           name="title"
+           type="text"
+           value="{{ form.title.value|default_if_none:'' }}"
+           placeholder="{{ form.title.field.widget.attrs.placeholder }}"
+           class="block w-full input"
+           required/>
+</div>
+<div>
+    {% if form.errors.title %}
+        <ul class="pt-0.5">
+            {% for error in form.errors.title %}<li class="text-sm text-red-500">{{ error|escape }}</li>{% endfor %}
+        </ul>
+    {% endif %}
+</div>

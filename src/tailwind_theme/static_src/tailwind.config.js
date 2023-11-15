@@ -42,6 +42,13 @@ module.exports = {
             maxWidth: {
                 '2xl': '40rem',
             },
+            colors: {
+                primary: {
+                  light: "#adb5bd", // For lighter primary color
+                  DEFAULT: "#f8f9fa", // Normal primary color
+                  dark: "#011627", // Used for hover, active, etc.
+                },
+              },
         },
     },
     plugins: [

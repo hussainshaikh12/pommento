@@ -1,0 +1,20 @@
+{% for item in comments %}
+    {% if forloop.first %}<h2 class="text-lg font-medium mb-2">Comments</h2>{% endif %}
+    <article class="text-base bg-white rounded dark:bg-gray-900 mb-3 shadow border-t ">
+        <footer class="flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="avatar bg-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                        <!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. -->
+                        <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 128c39.77 0 72 32.24 72 72S295.8 272 256 272c-39.76 0-72-32.24-72-72S216.2 128 256 128zM256 448c-52.93 0-100.9-21.53-135.7-56.29C136.5 349.9 176.5 320 224 320h64c47.54 0 87.54 29.88 103.7 71.71C356.9 426.5 308.9 448 256 448z"/>
+                    </svg>
+                </div>
+                <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">{{ item.name }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    <time pubdate datetime="2022-02-08" title="February 8th, 2022">{{ item.created_at }}</time>
+                </p>
+            </div>
+        </footer>
+        <p class="text-gray-500 dark:text-gray-400 ml-3">{{ item.body }}</p>
+    </article>
+{% endfor %}

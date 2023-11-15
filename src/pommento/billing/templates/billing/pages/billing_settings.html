@@ -1,127 +1,95 @@
-
-    {% extends "base_settings.html" %}
-    {% load
-pommento_utils_math %}
-{% load
-pommento_utils_timestamp %}
+{% extends "base_settings.html" %}
+{% load pommento_utils_math %}
+{% load pommento_utils_timestamp %}
 {% block head %}
-    <title>Billing and plans -
-    pommento</title>
-<meta name="robots" content="noindex,nofollow">
+    <title>Billing and plans - pommento</title>
+    <meta name="robots" content="noindex,nofollow">
 {% endblock %}
 {% block main %}
     <div>
-        <div>
-            <h1 class="text-2xl md:text-3xl font-semibold text-gray-900">Billing and plans</h1>
-        </div>
-        <div class="mt-12">
-            <div>
-                <h3 class="text-xl md:text-2xl font-semibold text-gray-900">Plans</h3>
+        <h1 class="text-2xl md:text-3xl font-semibold text-gray-900">Billing and plans</h1>
+    </div>
+    <div class="w-full mx-auto xl:w-4/5 mt-5">
+        {% if subscription %}<p class="font-semibold mb-2 text-lg">You are a pro member</p>{% endif %}
+        <div class="grid grid-cols-1 gap-16 lg:grid-cols-2 sm:gap-8">
+            <div class="border-0 rounded-none shadow-none card sm:rounded-lg md:border">
+                <div class="flex flex-col justify-between p-6 border-b border-gray-200">
+                    <p class="mb-1 text-lg font-semibold text-gray-600">Free</p>
+                    <p class="pb-0 my-2 font-mono text-4xl font-extrabold text-gray-600">$0</p>
+                    <p class="text-sm text-gray-500">User / month</p>
+                    <button class="w-full mt-6 btn btn-dark btn-lg " disabled>Subscribed</button>
+                </div>
+                <ul class="flex flex-col flex-grow p-6 space-y-3">
+                    <li class="flex items-start">
+                        <svg viewBox="0 0 20 20"
+                             fill="currentColor"
+                             class="flex-none w-4 h-4 mt-1 mr-2 text-gray-600">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd">
+                            </path>
+                        </svg>
+                        <span class="text-gray-700">1 Site</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg viewBox="0 0 20 20"
+                             fill="currentColor"
+                             class="flex-none w-4 h-4 mt-1 mr-2 text-gray-600">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd">
+                            </path>
+                        </svg>
+                        <span class="text-gray-700">100 Comments</span>
+                    </li>
+                </ul>
             </div>
-            <div class="mt-4 grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-3">
-                <div class="rounded border-2 border-gray-200 bg-white p-4">
-                    <dt>
-                        <p class="text-sm font-normal text-gray-500">Your current plan</p>
-                    </dt>
-                    <dd class="flex items-baseline">
-                        <p class="text-base font-medium text-gray-900">
-                            {% if request.user.subscription.status == "trialing" %}
-                                Free trial
-                            {% else %}
-                                {{ request.user.subscription.items.data.0.price.unit_amount|div:100|floatformat:"0" }} €
-                            {% endif %}
-                        </p>
-                    </dd>
+            <div class="border-0 rounded-none shadow-none card sm:rounded-lg md:border">
+                <div class="flex flex-col justify-between p-6 border-b border-gray-200">
                     <div>
-                        {% if request.user.subscription.cancel_at_period_end %}
-                            <form action="{% url 'pommento-billing:reactivate-subscription' %}?success=/settings/billing/"
-                                  method="post">
-                                {% csrf_token %}
-                                <input type="submit"
-                                       value="Reactivate subscription"
-                                       class="text-xs text-blue-600 hover:text-gray-800 font-semibold underline"/>
-                            </form>
-                        {% else %}
-                            <form action="{% url 'pommento-billing:cancel-subscription' %}?success=/settings/billing/"
-                                  method="post">
-                                {% csrf_token %}
-                                <input type="submit"
-                                       value="Cancel susbcription"
-                                       class="text-xs text-blue-600 hover:text-gray-800 font-semibold underline"/>
-                            </form>
-                        {% endif %}
+                        <div class="flex items-center justify-between">
+                            <p class="mb-1 text-lg font-semibold text-dark-700">Premium</p>
+                            <span class="badge bg-primary-light text-dark">Most popular</span>
+                        </div>
+                        <p class="my-2 font-mono text-4xl font-extrabold text-gray-900">$10</p>
+                        <p class="text-sm text-gray-500">User / month</p>
                     </div>
+                    {% if subscription %}
+                        <button class="w-full mt-6 btn btn-dark btn-lg" disabled>Subscribed</button>
+                    {% else %}
+                        <button id="add_payment" class="w-full mt-6 btn btn-dark btn-lg">Get started &rarr;</button>
+                    {% endif %}
                 </div>
-                <div class="rounded border-2 border-gray-200 bg-white p-4">
-                    <dt>
-                        <p class="text-sm font-normal text-gray-500">
-                            {% if request.user.subscription.status == "trialing" %}
-                                Free trial ends
-                            {% elif request.user.subscription.cancel_at_period_end %}
-                                Current subscription ends
-                            {% else %}
-                                Next payment due
-                            {% endif %}
-                        </p>
-                    </dt>
-                    <dd class="flex flex-col items-baseline">
-                        <p class="text-base font-medium text-gray-900">
-                            {% if request.user.subscription.current_period_end is not None %}
-                                {{ request.user.subscription.current_period_end|timestamp_to_datetime|date }}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </p>
-                        {% if request.user.subscription.cancel_at_period_end %}
-                            <p class="mt-1 text-xs font-medium text-gray-700">* It won't renew</p>
-                        {% endif %}
-                    </dd>
-                </div>
-                <div class="rounded border-2 border-gray-200 bg-white p-4">
-                    <dt>
-                        <p class="text-sm font-normal text-gray-500">Payment method</p>
-                    </dt>
-                    <dd class="flex items-baseline">
-                        <p class="text-base font-medium text-gray-900">
-                            {% if request.user.default_payment_method is not None %}
-                                {{ request.user.default_payment_method.card.brand|title }} ****{{ request.user.default_payment_method.card.last4 }}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </p>
-                    </dd>
-                    <div>
-                        <button id="add_payment_method_button"
-                                class="text-xs text-blue-600 hover:text-gray-800 font-semibold underline">
-                            {% if request.user.default_payment_method is not None %}
-                                Update payment method
-                            {% else %}
-                                Add payment method
-                            {% endif %}
-                        </button>
-                    </div>
-                </div>
+                <ul class="flex flex-col flex-grow p-6 space-y-3">
+                    <li class="flex items-start">
+                        <svg viewBox="0 0 20 20"
+                             fill="currentColor"
+                             class="flex-none w-4 h-4 mt-1 mr-2 text-gray-600">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd">
+                            </path>
+                        </svg>
+                        <span class="text-gray-700">Unlimited Sites</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg viewBox="0 0 20 20"
+                             fill="currentColor"
+                             class="flex-none w-4 h-4 mt-1 mr-2 text-gray-600">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd">
+                            </path>
+                        </svg>
+                        <span class="text-gray-700">Unlimited Comments</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg viewBox="0 0 20 20"
+                             fill="currentColor"
+                             class="flex-none w-4 h-4 mt-1 mr-2 text-gray-600">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd">
+                            </path>
+                        </svg>
+                        <span class="text-gray-700">Unlimited Support</span>
+                    </li>
+                </ul>
             </div>
-        </div>
-        <div class="mt-12">
-            <div>
-                <h3 class="text-xl md:text-2xl font-semibold text-gray-900">Billing information</h3>
-            </div>
-            <form action="{% url 'pommento-billing:billing-settings' %}"
-                  method="post"
-                  class="mt-4 rounded border-2 border-gray-200 bg-white">
-                {% csrf_token %}
-                <div class="p-4 md:p-10">
-                    <div class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">{{ form }}</div>
-                    <div class="pt-6 flex flex-row justify-end">
-                        <input type="submit" value="Update" class="ml-3 btn btn-primary btn-small"/>
-                    </div>
-                </div>
-            </form>
         </div>
     </div>
     <script type="text/javascript">
-        let addPaymentMethodButton = document.getElementById("add_payment_method_button")
+        let addPaymentMethodButton = document.getElementById("add_payment")
 
         if (addPaymentMethodButton !== null) {
             addPaymentMethodButton.addEventListener("click", () => {
@@ -135,4 +103,3 @@ pommento_utils_timestamp %}
         }
     </script>
 {% endblock %}
-

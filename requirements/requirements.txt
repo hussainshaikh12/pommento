@@ -47,3 +47,5 @@ google-auth==2.16.0
 
 # Billing
 stripe==4.2.0
+
+pangea-sdk==3.1.0

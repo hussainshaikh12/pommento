@@ -2,7 +2,6 @@ import json
 import os
 from pathlib import Path
 
-import dj_database_url
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -19,22 +18,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = 'RENDER' not in os.environ
 if os.environ.get("DEBUG", "False") == "True":
     DEBUG = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_SSL_REDIRECT = True
-if os.environ.get("SECURE_SSL_REDIRECT", "True") == "False":
-    SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-X_FRAME_OPTIONS = "DENY"
 
-ALLOWED_HOSTS = json.loads(os.environ.get("ALLOWED_HOSTS"))
-INTERNAL_IPS = json.loads(os.environ.get("INTERNAL_IPS", "[]"))
+X_FRAME_OPTIONS = 'ALLOWALL'
 
+XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
 
+ALLOWED_HOSTS = ['*']
+
+CORS_ALLOW_HEADERS = "*"
 # Application definition
 
 INSTALLED_APPS = [
@@ -58,6 +52,7 @@ INSTALLED_APPS = [
     "pommento.auth",
     "pommento.billing",
     "pommento.utils",
+    "pommento.core"
 ]
 
 if DEBUG is True:
@@ -78,7 +73,6 @@ MIDDLEWARE = [
 
 if DEBUG is True:
     MIDDLEWARE.insert(0, "django_browser_reload.middleware.BrowserReloadMiddleware")
-    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
     MIDDLEWARE.insert(0, "pyinstrument.middleware.ProfilerMiddleware")
 
 ROOT_URLCONF = "pommento.urls"
@@ -103,16 +97,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "pommento.wsgi.application"
 
-CORS_ORIGIN_ALLOW_ALL = False
-if os.environ.get("CORS_ORIGIN_ALLOW_ALL", "False") == "True":
-    CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = json.loads(os.environ.get("CORS_ORIGIN_WHITELIST"))
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {"default": dj_database_url.config(default=os.environ.get("DATABASE_URL"))}
+DATABASES = {    
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'mydatabase', 
+    }}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -238,3 +234,7 @@ STRIPE_PRICE_ID = os.environ.get("STRIPE_PRICE_ID", None)
 SUBSCRIPTION_TRIAL_PERIOD_DAYS = 14
 
 AUTH_USER_NAME_MAX_LENGTH = int(os.environ.get("AUTH_USER_NAME_MAX_LENGTH", "150"))
+
+# Pangea
+PANGEA_DOMAIN = os.environ.get('PANGEA_DOMAIN')
+PANGEA_TOKEN = os.environ.get('PANGEA_TOKEN')
