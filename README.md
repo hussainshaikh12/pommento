@@ -3,7 +3,7 @@ Secure comment service using pangea
 
 [Youtube](https://youtu.be/foHdaPlQCyI)
 
-[Multi-device](./pommento.png)
+![Multi-device](./pommento.png)
 ## Table of Contents
 - [Pommento](#pommento)
 - [Table of Contents](#table-of-contents)
