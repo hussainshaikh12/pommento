@@ -20,8 +20,8 @@ from pangea.config import PangeaConfig
 from pangea.services import Audit
 
 
-# config = PangeaConfig(domain=settings.PANGEA_DOMAIN)
-# audit = Audit(settings.PANGEA_TOKEN, config=config)
+config = PangeaConfig(domain=settings.PANGEA_DOMAIN)
+audit = Audit(settings.PANGEA_TOKEN, config=config)
 
 @never_cache
 @require_http_methods(["GET", "POST"])
@@ -108,7 +108,7 @@ def login_view(request):
                     )
                     if user is not None:
                         login(request, user)
-                        # audit.log("User: " +request.user.name+ " logged into the app")
+                        audit.log("User: " +request.user.name+ " logged into the app")
                         return redirect("pommento-core:site-list")
                     else:
                         form.add_error(None, "Incorrect email address or password.")
@@ -149,7 +149,7 @@ def register_view(request):
                 
 
                 login(request, user)
-                # audit.log("User: " +request.user.name+ " Regiestered and logged into the app")
+                audit.log("User: " +request.user.name+ " Regiestered and logged into the app")
                 return redirect("pommento-core:site-list")
             except IntegrityError as e:
                 form.add_error(
@@ -191,5 +191,5 @@ def signin_with_google_view(request):
     user.save()
 
     login(request, user)
-    # audit.log("User: " +request.user.name+ " logged in using google into the app")
+    audit.log("User: " +request.user.name+ " logged in using google into the app")
     return redirect("pommento-core:site-list")
